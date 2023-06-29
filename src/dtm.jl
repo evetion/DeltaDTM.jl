@@ -1,6 +1,3 @@
-import Interpolations
-using Dictionaries
-
 function setup_bias(bias_fn=joinpath(@__DIR__, "../data/biasv4.gpkg"))
     bias = GeoDataFrames.read(bias_fn)
     dropmissing!(bias)
@@ -51,23 +48,16 @@ function multiresdtm(ga, df; maxdepth=5, n=3, reducer=median, r2=std)
         d = Dictionary{CartesianIndex{2},Vector{Float32}}()
 
         for p in Tables.rows(df)
-            # i, j = indices(g, SVector{2}(p.longitude, p.latitude), GeoArrays.Center()).I
             I = indices(g, SVector{2}(p.longitude, p.latitude), GeoArrays.Center())
             if I in keys(d)
                 push!(d[I], p.height)
             else
                 insert!(d, I, [p.height])
             end
-            # g[i, j, 1] += p.height
-            # g[i, j, 2] += 1
         end
         if div != maxdepth
             A = imresize(pg[:, :, 1], size(g)[1:2], method=Interpolations.BSpline(Interpolations.Linear()))
             B = imresize(pg[:, :, 2], size(g)[1:2], method=Interpolations.BSpline(Interpolations.Linear()))
-            # A = resample(CloughTocher(), pg, size(g)[1:2], 1).A[:, :, 1]
-            # B = resample(CloughTocher(), pg, size(g)[1:2], 2).A[:, :, 1]
-            # A[isnan.(A)] .= 0.0
-            # B[isnan.(B)] .= 1.0
 
             m = trues(size(A))
             for (k, v) in pairs(d)
@@ -75,14 +65,9 @@ function multiresdtm(ga, df; maxdepth=5, n=3, reducer=median, r2=std)
                 g[k, 2] = r2(v)
                 m[k] = length(v) <= n
             end
-            # Only update high-res when we have at least n values
-            # m = g[:, :, 2] .<= n
-            # @info sum(m) / length(m)
             g[m, 1] .= A[m]
             g[m, 2] .= B[m]
-            # g[m, 2] .= 1
         end
-        # g[:, :, 1] ./= g[:, :, 2]  # take mean
         pg = g
     end
     g
@@ -499,12 +484,11 @@ function deltadem(tile, x, y, icefn, gedifn, mtile, etile, otile, ctile, tin, ou
     # but only for the cells that are not covered by spaceborne lidar
     error_mask = (ea .>= 0.75) .| isinf.(ea) .& .!combined_mask
 
-    # Use PMF when they're cities (and thus probably some coastal protections)
-    # Otherwise we apply PSF everywhere
+    # Create mask of non-terrain points by combining all masks
     m = nm .& ((fm .& .!covermask) .| error_mask .| (low_mask .& .!combined_mask) .| sfm)
     m .&= .!quality_mask  # values to interpolate
 
-    # Place back ICESat-2 values in removed open terrain
+    # Keep burned ICESat-2 values in removed open terrain
     pbm = m .& icemask .& covermask .& lower_mask
     A[pbm] .= gedivalues[pbm]
     m .&= .!pbm

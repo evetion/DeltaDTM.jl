@@ -53,7 +53,6 @@ function plot_bias(dff, b, tile, sub=1)
         xlabel="CopernicusDEM - ICESat-2 [m]",
         ylabel="Count",
         xticks=-2:0.5:2,
-        # yaxis=false,
         dpi=300,
         color_palette=landcovercolors(dff.covername),
     )
@@ -63,7 +62,6 @@ function plot_bias(dff, b, tile, sub=1)
         0,
         text(@sprintf("%.2f", b), :left, pointsize=8),
     )
-    # StatsPlots.savefig(joinpath(@__DIR__, "../scripts/bias/plots_2", first(splitext(basename(tile))) * "_$sub.png"))
     closeall()
     return nothing
 end

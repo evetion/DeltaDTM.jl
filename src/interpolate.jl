@@ -1,6 +1,3 @@
-using NearestNeighbors
-using Proj
-
 const width_of_degree_in_km = 111.32
 
 function calc_angles(coords, coordinates, work)
