@@ -1,4 +1,4 @@
-name = "DeltaDEM"
+name = "DeltaDTM"
 uuid = "3dc571ff-8375-45bc-b3c6-5490d0673e08"
 authors = ["X"]
 version = "0.1.0"

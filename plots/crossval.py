@@ -10,7 +10,7 @@ sns.set_context("paper")
 sns.set_style("ticks")
 
 df = gpd.read_file(
-    "DeltaDEM/crossval_tiles.gpkg"
+    "DeltaDTM/crossval_tiles.gpkg"
 )
 df.longitude = df.geometry.x
 df.latitude = df.geometry.x

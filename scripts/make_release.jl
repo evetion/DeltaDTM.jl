@@ -8,23 +8,23 @@ using DataAPI
 fn = joinpath(@__DIR__, "data/coastal_lowland_tiles_v4.gpkg")
 df = GeoDataFrames.read(fn)
 
-input_folder = "DeltaDEM/data/deltadem/v7"
-output_folder = "DeltaDEM/data/deltadem/v1.0"
+input_folder = "DeltaDTM/data/deltadtm/v7"
+output_folder = "DeltaDTM/data/deltadtm/v1.0"
 
 md = [
-    ("TIFFTAG_DOCUMENTNAME", "DeltaDEM v1.0"),
-    ("TIFFTAG_IMAGEDESCRIPTION", "A global coastal digital terrain model, based on CopernicusDEM, ESA WorldCover, ICESat-2 and GEDI data. For more information, see X et al. (2023) DeltaDEM: A global coastal digital terrain model."),
-    ("TIFFTAG_SOFTWARE", "DeltaDEM.jl"),
+    ("TIFFTAG_DOCUMENTNAME", "DeltaDTM v1.0"),
+    ("TIFFTAG_IMAGEDESCRIPTION", "A global coastal digital terrain model, based on CopernicusDEM, ESA WorldCover, ICESat-2 and GEDI data. For more information, see X et al. (2023) DeltaDTM: A global coastal digital terrain model."),
+    ("TIFFTAG_SOFTWARE", "DeltaDTM.jl"),
     ("TIFFTAG_ARTIST", "X"),
     ("TIFFTAG_COPYRIGHT", "CC-BY-SA 4.0"),
 ]
 limit = 10
 
-"""Copernicus_DSM_10_N00_00_E106_00_DEM.tif becomes DeltaDEM_v1_0_N00E099.tif"""
+"""Copernicus_DSM_10_N00_00_E106_00_DEM.tif becomes DeltaDTM_v1_0_N00E099.tif"""
 function todd(copdemtile)
     corner = splitext(basename(copdemtile))[1]
     lats, lons = split(corner, "_")[[4, 6]]
-    "DeltaDEM_v1_0_" * lats * lons * ".tif"
+    "DeltaDTM_v1_0_" * lats * lons * ".tif"
 end
 
 subset!(df, :tile => tile -> isfile.(joinpath.(input_folder, tile)))
@@ -63,13 +63,13 @@ subset!(df, :tile => tile -> isfile.(joinpath.(input_folder, tile)))
     GeoArrays.write(omtile, gam; nodata=-9999, shortname="COG", options=Dict("COMPRESS" => "ZSTD", "PREDICTOR" => "2"))
 end
 
-# Make deltadem_tiles.gpkg
+# Make deltadtm_tiles.gpkg
 df.tile = todd.(df.tile)
 subset!(df, :tile => tile -> isfile.(joinpath.(output_folder, tile)))
 rename!(df, Dict(:loc => :copernicus, :x => :longitude, :y => :latitude))
 select!(df, Not(Cols(:dem, :project, :artefacts, :path, :ice, :id, :val)))
 df.zipfile = df.copernicus .|> x -> split(x, "/")[2] .* ".zip"
-GeoDataFrames.write("deltadem_tiles.gpkg", df)
+GeoDataFrames.write("deltadtm_tiles.gpkg", df)
 
 # Zip tiles per continent
 for sdf in groupby(df, :zipfile)

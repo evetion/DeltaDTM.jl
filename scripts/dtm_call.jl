@@ -9,7 +9,7 @@ using ProgressMeter
 fn = joinpath(@__DIR__, "data/coastal_lowland_tiles_v4.gpkg")
 df = GeoDataFrames.read(fn)
 
-output_folder = "DeltaDEM/data/deltadem/v1"
+output_folder = "DeltaDTM/data/deltadtm/v1"
 
 # Only process tiles that are not yet processed
 subset!(df, :tile => tile -> .!isfile.(joinpath.(output_folder, basename.(tile))))
@@ -19,16 +19,16 @@ subset!(df, :tile => tile -> .!isfile.(joinpath.(output_folder, basename.(tile))
 nproc = 5
 p = Progress(nrow(df), dt=1.0)
 for subdf in collect(Iterators.partition(df, nproc * 10))
-    t = addprocs(nproc, exeflags="--heap-size-hint=8G -JDeltaDEM_all.so")
+    t = addprocs(nproc, exeflags="--heap-size-hint=8G -JDeltaDTM_all.so")
     @everywhere begin
-        using DeltaDEM
+        using DeltaDTM
         using ProgressMeter
-        output_folder = "DeltaDEM/data/deltadem/v1"
+        output_folder = "DeltaDTM/data/deltadtm/v1"
     end
 
     pmap(procs()) do _
         folder = joinpath(@__DIR__, "../../data")
-        global tin = DeltaDEM.setup_bias(joinpath(folder, "biasv5_2.gpkg"))
+        global tin = DeltaDTM.setup_bias(joinpath(folder, "biasv5_2.gpkg"))
         nothing
     end
 
@@ -44,7 +44,6 @@ for subdf in collect(Iterators.partition(df, nproc * 10))
         mtile = joinpath(folder, "copernicus/copernicus_orig/masks", tilename)
         mtiles = joinpath(folder, "copernicus/copernicus_orig/masks", tilefilename)
         ctile = joinpath(folder, "esa-worldcover-2021/copernicus2", tilename)
-        vtile = joinpath(folder, "validation", tilename)
         icefn = joinpath(folder, "bias3/$(tilef)/bias.txt")
         gedifn = joinpath(folder, "biasg2/$(tilef)/bias.txt")
 
@@ -52,7 +51,7 @@ for subdf in collect(Iterators.partition(df, nproc * 10))
         isfile(ofn) && return nothing
 
         try
-            DeltaDEM.deltadem(tile, subdf.x[i], subdf.y[i], icefn, gedifn, mtile, etile, otile, ctile, tin, output_folder; cropsize=0.1, lowlimit=subdf.lowlimit[i], crossval=false, debug=false)
+            DeltaDTM.deltadtm(tile, subdf.x[i], subdf.y[i], icefn, gedifn, mtile, etile, otile, ctile, tin, output_folder; cropsize=0.1, lowlimit=subdf.lowlimit[i], crossval=false, debug=false)
         catch e
             e isa InterruptException && throw(e)
             Base.showerror(stdout, e)

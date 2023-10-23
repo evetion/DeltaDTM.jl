@@ -1,7 +1,7 @@
 using Distributed
 
 addprocs(6)#, exeflags="--project=$(Base.active_project())")
-@everywhere using DeltaDEM
+@everywhere using DeltaDTM
 @everywhere using DelimitedFiles
 @everywhere using CSV
 @everywhere using DataFrames
@@ -24,7 +24,7 @@ outputfolder = "data/biasv1/"
     fn = joinpath(outputfolder, basename(tilename) * ".gpkg")
     if !isfile(fn)
         try
-            vnt = DeltaDEM.process_tile(tile; divideby=2)
+            vnt = DeltaDTM.process_tile(tile; divideby=2)
             df = DataFrame(vnt)
             GeoDataFrames.write(fn, df; geom_columns=(:geom,))
         catch e

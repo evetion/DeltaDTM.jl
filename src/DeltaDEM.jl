@@ -1,4 +1,4 @@
-module DeltaDEM
+module DeltaDTM
 
 using DataFrames
 using Dictionaries

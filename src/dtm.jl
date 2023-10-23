@@ -204,7 +204,7 @@ end
 
 
 
-function deltadem(tile, x, y, icefn, gedifn, mtile, etile, otile, ctile, tin, output_folder; cropsize::Union{Nothing,Float64}=0.05, lowlimit=-Inf, crossval=false, debug=false)
+function deltadtm(tile, x, y, icefn, gedifn, mtile, etile, otile, ctile, tin, output_folder; cropsize::Union{Nothing,Float64}=0.05, lowlimit=-Inf, crossval=false, debug=false)
     output_fn = splitext(basename(tile))[1]
     ofn = joinpath(output_folder, output_fn)
     ofn = joinpath(output_folder, output_fn)
@@ -212,7 +212,7 @@ function deltadem(tile, x, y, icefn, gedifn, mtile, etile, otile, ctile, tin, ou
     ga = GeoArrays.read(tile)
     gao = GeoArrays.read(otile)
     gam = GeoArrays.read(mtile)
-    ea = DeltaDEM.coalesce2d(gam, 255)
+    ea = DeltaDTM.coalesce2d(gam, 255)
     any(ea .== 0) || return output_fn
 
     # Open error file
@@ -232,16 +232,16 @@ function deltadem(tile, x, y, icefn, gedifn, mtile, etile, otile, ctile, tin, ou
         @assert size(ga) == size(gam) == size(ega) == size(lga) == size(gao)
     end
 
-    ea = DeltaDEM.coalesce2d(ega, Inf)
-    cover = DeltaDEM.coalesce2d(lga, 0)
+    ea = DeltaDTM.coalesce2d(ega, Inf)
+    cover = DeltaDTM.coalesce2d(lga, 0)
 
     # Apply bias correction
-    DeltaDEM.apply_bias!(ga, tin)
+    DeltaDTM.apply_bias!(ga, tin)
 
     # Clamp original roughness (TPI) for pattern burning later on
-    O = DeltaDEM.coalesce2d(gao, 0)
+    O = DeltaDTM.coalesce2d(gao, 0)
     pattern = GeoArrayOps.TPI(O)
-    A = DeltaDEM.coalesce2d(ga, Inf)
+    A = DeltaDTM.coalesce2d(ga, Inf)
 
     # Keep all data higher than 100m
     high_mask = A .> 100

@@ -12,7 +12,7 @@ rmse(x) = sqrt(sum(x .^ 2) / length(x))
 mad(x) = median(abs.(x .- median(x)))
 
 
-output_folder = "DeltaDEM/data/deltadem/v3"
+output_folder = "DeltaDTM/data/deltadtm/v3"
 files = readdir(output_folder, join=true)
 filter!(endswith(".pq"), files)
 
@@ -47,12 +47,12 @@ rows = NamedTuple[]
     point = GeoDataFrames.AG.createpoint([lon + 0.5, lat + 0.5])
     df = GeoParquet.read(tile)
     df = subset(df, :height => h -> isfinite.(h))
-    df = subset(df, :deltadem => h -> isfinite.(h))
+    df = subset(df, :deltadtm => h -> isfinite.(h))
     df = subset(df, :height => d -> -50 .<= d .<= 10)
-    df = subset(df, :deltadem => d -> -1000 .<= d .<= 1000)
+    df = subset(df, :deltadtm => d -> -1000 .<= d .<= 1000)
     df = subset(df, :cover => c -> c .!== 0)
     df = subset(df, :cover => c -> c .!== 80)
-    df.diff = df.deltadem - df.height
+    df.diff = df.deltadtm - df.height
     df = subset(df, :diff => d -> isfinite.(d))
     nrow(df) == 0 && continue
     values = df.diff

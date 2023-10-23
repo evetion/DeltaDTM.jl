@@ -44,8 +44,8 @@ dems = Dict(
     "MERIT" => "data/merit",
     "CoastalDEM" => "data/coastaldem",
     "FABDEM" => "data/FABDEM",
-    "DeltaDEM" => "DeltaDEM/data/demo/flevodem",
-    "DeltaDEM" => "DeltaDEM/data/deltadem/v1",
+    "DeltaDTM" => "DeltaDTM/data/demo/flevodem",
+    "DeltaDTM" => "DeltaDTM/data/deltadtm/v1",
 )
 
 @enum landcover begin
@@ -188,7 +188,7 @@ demf = Dict(
     "MERIT" => 3,
     "CoastalDEM" => 4,
     "FABDEM" => 5,
-    "DeltaDEM" => 6,
+    "DeltaDTM" => 6,
 )
 
 function quantize(x, v)

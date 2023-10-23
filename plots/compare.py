@@ -58,7 +58,7 @@ compare = {
     "MERIT": "data/merit",
     "CoastalDEM": "data/coastaldem",
     "FABDEM": "data/FABDEM",
-    "DeltaDEM": "code/DeltaDEM/data/deltadem/v1",
+    "DeltaDTM": "code/DeltaDTM/data/deltadtm/v1",
 }
 
 
@@ -313,7 +313,7 @@ def plot_compare(tile, window, x, y, vmin=0, vmax=10, vs=10):
     return None
 
 orig_folder = "data/copernicus/copernicus_orig/elevation/"
-dd_folder = compare["DeltaDEM"]
+dd_folder = compare["DeltaDTM"]
 
 def plot_explain(tile, window, x, y, vmin=0, vmax=10, vs=10):
     fig = plt.figure(figsize=(3.31, 5.1), dpi=300)
@@ -454,7 +454,7 @@ def plot_explain(tile, window, x, y, vmin=0, vmax=10, vs=10):
     gl.bottom_labels = False
     gl.right_labels = False
 
-    # DeltaDEM
+    # DeltaDTM
     fn = f"{dd_folder}/{tile}"
     src = rio.open(fn)
     dd = src.read(1, masked=True, window=window)
@@ -473,7 +473,7 @@ def plot_explain(tile, window, x, y, vmin=0, vmax=10, vs=10):
         interpolation="none",
         transform=transform(window, src.transform),
     )
-    hax.set_title("DeltaDEM")
+    hax.set_title("DeltaDTM")
     hax.set_aspect("auto")
 
     gl = hax.gridlines(
@@ -492,7 +492,7 @@ def plot_explain(tile, window, x, y, vmin=0, vmax=10, vs=10):
     gl.bottom_labels = True
     gl.right_labels = False
 
-    # nDSM (by DeltaDEM)
+    # nDSM (by DeltaDTM)
     hax = fig.add_subplot(spec[2, 1], projection=ccrs.PlateCarree())
     hax.add_geometries(geometries, ccrs.PlateCarree(), facecolor="lightgray", zorder=-1)
     imndsm = show(
@@ -785,7 +785,7 @@ pltk = {
     "MERIT": {"label": "MERIT", "c": "purple", "lw": 1, "linestyle": "dashed"},
     "CoastalDEM": {"label": "CoastalDEM", "c": "blue", "lw": 1, "linestyle": "dashdot"},
     "FABDEM": {"label": "FABDEM", "c": "green", "lw": 1, "linestyle": "dotted"},
-    "DeltaDEM": {"label": "DeltaDEM", "c": "red", "lw": 1, "zorder": -5},
+    "DeltaDTM": {"label": "DeltaDTM", "c": "red", "lw": 1, "zorder": -5},
 }
 
 
