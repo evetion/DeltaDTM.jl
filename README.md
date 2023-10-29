@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/658728727.svg)](https://zenodo.org/doi/10.5281/zenodo.10051451)
+
 # DeltaDTM.jl
 Julia package used to create DeltaDTM
 
